@@ -1,23 +1,6 @@
 import { expect } from 'chai';
 import { IMC, calculateIMC, validateInputs } from '../src/imc.js';
-
-
-const pesoKG = 80;
-const alturaCM = 180;
-const negativePesoInput = -80;
-const negativeAlturaInput = -180;
-const mockIMC = (pesoKG / ((alturaCM/100)**2)).toFixed(2);
-
-const invalidInputs = {
-    objectInput:{property: ''},
-    arrayInput: [0],
-    stringInput: '80',
-    emptyStringInput: '',
-}
-
-const mockValidValidateResponse = () => true;
-const mockInvalidValidateResponse = () => false;
-const mockCalculateIMC = () => mockIMC;
+import { alturaCM, mockIMC, pesoKG, constants } from './imc.constants.js';
 
 describe('TESTING - VALIDATE INPUTS', () => {
   it('Should return true if input is valid', () => {
@@ -26,12 +9,12 @@ describe('TESTING - VALIDATE INPUTS', () => {
   });
 
   it('Should return false if input is not a number', () => {
-    const response = validateInputs(invalidInputs.stringInput, invalidInputs.objectInput);
+    const response = validateInputs(constants.stringInput, constants.invalidInputs.objectInput);
     expect(response).to.equal(false);
   });
 
   it('Should return false if input is a negative number', () => {
-    const response = validateInputs(negativePesoInput, negativeAlturaInput);
+    const response = validateInputs(constants.negativePesoInput, constants.negativeAlturaInput);
     expect(response).to.equal(false);
   });
 
@@ -54,14 +37,21 @@ describe('TESTING - CALCULATE IMC', () => {
 
 describe('TESTING - HANDLE', () => {
     it('Should return IMC when input is valid', () => {
-        const measures = { pesoKG, alturaCM }
-        const response = IMC.handle(mockValidValidateResponse, mockCalculateIMC, measures);
+        const measures = { pesoKG, alturaCM };
+        const validate = constants.mockValidValidateResponse;
+        const calculate = constants.mockCalculateIMC;
+        const response = IMC.handle(validate, calculate, measures);
         expect(response).to.equal(mockIMC);
     });
 
     it('Should return ERROR when input is invalid', () => {
-        const measures = { negativePesoInput, negativeAlturaInput }
-        const response = IMC.handle(mockInvalidValidateResponse, mockCalculateIMC, measures);
+        const measures = { 
+          pesoKG: constants.negativePesoInput, 
+          alturaCM: constants.negativeAlturaInput
+        }
+        const validate = constants.mockInvalidValidateResponse;
+        const calculate = constants.mockCalculateIMC;
+        const response = IMC.handle(validate, calculate, measures);
         expect(response.error).to.equal('INVALID INPUTS');
     });
 });
